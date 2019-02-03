@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 7e133ae0a7a40444ebfcff198ddc6783
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _SnowSMH: {fileID: 2800000, guid: 663fd7e916c14644facb141679e7b564, type: 3}
+  - _SnowNormal: {fileID: 2800000, guid: 663fd7e916c14644facb141679e7b564, type: 3}
+  - _AlbedoMetal: {fileID: 2800000, guid: e2de209c5d00df84597ec329a59f31e4, type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

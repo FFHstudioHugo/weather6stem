@@ -1,0 +1,558 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: ImmersiveWeatherControl
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 0dba8e19356226040b3a5cb9a917f51f,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_Name
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Hour
+    value: 8.1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: WeatherState
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Wetnessvalue
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Snownessvellue
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: lightintensity
+    value: 1.25
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Longitude
+    value: 2505.44
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Skybox
+    value: 
+    objectReference: {fileID: 2100000, guid: 80444ff05baf7094aa6a467b3c12756d, type: 2}
+  - target: {fileID: 0}
+    propertyPath: Skybox_Exposure_Multiplier
+    value: 1.02
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Environment_Lighting_Multiplier
+    value: 0.76
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Fog_Color.r
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Fog_Color.g
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Fog_Color.b
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Fog_Color.a
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Fog_Intensity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Atmospheric_Scatterring
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: QualitySetting
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_VolumeDev
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_VolumeBuild
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: atm
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericGlobalPower
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: RayleighDensity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: RayleighColor
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: MiePower
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericPower
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.size
+    value: 7
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].time
+    value: -0.0050453916
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].value
+    value: -0.1797535
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[0].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].time
+    value: 4.264422
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].value
+    value: -0.102466896
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].inSlope
+    value: 0.040009335
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].outSlope
+    value: 0.040009335
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[1].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].time
+    value: 7.7218113
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].value
+    value: 0.6297415
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].inSlope
+    value: 0.25240824
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].outSlope
+    value: 0.25240824
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[2].outWeight
+    value: 0.24588633
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].time
+    value: 12.483089
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].value
+    value: 1.0961809
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].inSlope
+    value: -0.013221749
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].outSlope
+    value: -0.013221749
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].inWeight
+    value: 0.4619704
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[3].outWeight
+    value: 0.34078094
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].time
+    value: 17.614168
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].value
+    value: 0.34073243
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].inSlope
+    value: -0.3657517
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].outSlope
+    value: -0.3657517
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].inWeight
+    value: 0.13357463
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[4].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].time
+    value: 19.65318
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].value
+    value: -0.15996966
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].inSlope
+    value: -0.008128069
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].outSlope
+    value: -0.008128069
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[5].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].time
+    value: 20.91161
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].value
+    value: -0.16667014
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_Curve.Array.data[6].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_PreInfinity
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_PostInfinity
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: DayLightIntensity.m_RotationOrder
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.size
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].time
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].value
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[0].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].time
+    value: 5.012721
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].value
+    value: -0.0012968779
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[1].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].time
+    value: 12.883176
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].value
+    value: 0.21030629
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[2].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].time
+    value: 20.469744
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].value
+    value: -0.0037580132
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].inSlope
+    value: 0.0037670536
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].outSlope
+    value: 0.0037670536
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].tangentMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[3].outWeight
+    value: 0.6972382
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].time
+    value: 24
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].value
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].inSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].outSlope
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].tangentMode
+    value: 136
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].weightedMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].inWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_Curve.Array.data[4].outWeight
+    value: 0.33333334
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_PreInfinity
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_PostInfinity
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: AtmosphericIntensity.m_RotationOrder
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: FXWeather
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: WeatherStack
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Sun
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: SunPivot
+    value: 
+    objectReference: {fileID: 0}
