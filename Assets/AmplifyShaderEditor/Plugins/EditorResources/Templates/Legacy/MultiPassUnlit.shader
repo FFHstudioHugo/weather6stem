@@ -40,6 +40,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 			struct v2f
 			{
 				float4 pos : SV_POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 				/*ase_interp(1,):sp=sp.xyzw*/
 			};
@@ -50,6 +51,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 				UNITY_INITIALIZE_OUTPUT(v2f,o);
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				
 				/*ase_vert_code:v=appdata;o=v2f*/
 				
@@ -107,6 +109,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 			struct v2f
 			{
 				float4 pos : SV_POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 				/*ase_interp(1,):sp=sp.xyzw*/
 			};
@@ -117,6 +120,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 				UNITY_INITIALIZE_OUTPUT(v2f,o);
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				
 				/*ase_vert_code:v=appdata;o=v2f*/
 				
@@ -172,6 +176,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 			struct v2f
 			{
 				float4 pos : SV_POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 				/*ase_interp(1,):sp=sp.xyzw*/
 			};
@@ -182,6 +187,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 				UNITY_INITIALIZE_OUTPUT(v2f,o);
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				
 				/*ase_vert_code:v=appdata;o=v2f*/
 				
@@ -237,6 +243,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 			struct v2f
 			{
 				V2F_SHADOW_CASTER;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 				/*ase_interp(1,):sp=sp.xyzw*/
 			};
@@ -248,6 +255,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 				UNITY_INITIALIZE_OUTPUT(v2f,o);
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				UNITY_TRANSFER_INSTANCE_ID(v, o);
 				
 				/*ase_vert_code:v=appdata;o=v2f*/
 				
@@ -270,6 +278,7 @@ Shader /*ase_name*/ "Hidden/Templates/Legacy/Multi Pass Unlit" /*end*/
 			}
 			ENDCG
 		}
+		/*ase_pass_end*/
 	}
 	CustomEditor "ASEMaterialInspector"
 }

@@ -49,7 +49,20 @@ namespace AmplifyShaderEditor
 				dataCollector.AddToIncludes( UniqueId, Constants.UnityCgLibFuncs );
 
 			if( !dataCollector.IsTemplate || dataCollector.TemplateDataCollectorInstance.CurrentSRPType != TemplateSRPType.HD )
-				dataCollector.AddToUniforms( UniqueId, "uniform sampler2D _CameraDepthTexture;" );
+			{
+				if( dataCollector.IsTemplate && dataCollector.CurrentSRPType == TemplateSRPType.Lightweight )
+				{
+					//dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureSRPVar );
+					//dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureSRPSampler );
+					dataCollector.AddToDefines( UniqueId, Constants.CameraDepthTextureLWEnabler );
+				}
+				else
+				{
+					dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureValue );
+				}
+
+				dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureTexelSize );
+			}
 
 			string screenPos = string.Empty;
 			string screenPosNorm = string.Empty;
@@ -63,8 +76,25 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
-				screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+				if( dataCollector.IsTemplate )
+				{
+					string ppsScreenPos = string.Empty;
+					if( !dataCollector.TemplateDataCollectorInstance.GetCustomInterpolatedData( TemplateInfoOnSematics.SCREEN_POSITION_NORMALIZED, WirePortDataType.FLOAT4, PrecisionType.Float, ref ppsScreenPos, true, MasterNodePortCategory.Fragment ) )
+					{
+						screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+						screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+					}
+					else
+					{
+						screenPos = ppsScreenPos;
+						screenPosNorm = ppsScreenPos;
+					}
+				}
+				else
+				{
+					screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+					screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+				}
 			}
 
 			string screenDepth = TemplateHelperFunctions.CreateDepthFetch( dataCollector, screenPos );

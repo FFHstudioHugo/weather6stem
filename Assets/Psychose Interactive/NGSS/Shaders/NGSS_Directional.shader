@@ -1,3 +1,5 @@
+// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
+
 // Collects cascaded shadows into screen space buffer
 Shader "Hidden/NGSS_Directional" {
 Properties {
@@ -250,7 +252,7 @@ uniform float NGSS_FILTER_SAMPLERS_DIR = 32;
 uniform float NGSS_TEST_SAMPLERS_DIR = 16;
 
 //INLINE SAMPLING
-#if (SHADER_TARGET < 30  || UNITY_VERSION <= 570 || defined(SHADER_API_D3D9) || defined(SHADER_API_GLES) || defined(SHADER_API_PSP2) || defined(SHADER_API_N3DS) || defined(SHADER_API_GLCORE))
+#if (SHADER_TARGET < 30  || UNITY_VERSION <= 570 || defined(SHADER_API_D3D9) || defined(SHADER_API_GLES) || defined(SHADER_API_PSP2) || defined(SHADER_API_N3DS))
 	//#define NO_INLINE_SAMPLERS_SUPPORT
 	//#define NGSS_NO_SUPPORT_DIR
 #elif (defined(NGSS_PCSS_FILTER_DIR) && !defined(UNITY_NO_SCREENSPACE_SHADOWS))
@@ -281,7 +283,7 @@ float2 VogelDiskSampleDir(int sampleIndex, int samplesCount, float phi)
 	
 	return float2(r * cosine, r * sine);
 }
-
+/*
 float OrderedDitheringDir(float x, float y, float c0)
 {
     //dither matrix reference: https://en.wikipedia.org/wiki/Ordered_dithering
@@ -303,7 +305,7 @@ float OrderedDitheringDir(float x, float y, float c0)
     //original step(limit, c0 + 0.01);
 
     return lerp(limit*c0, 1.0, c0);
-}
+}*/
 
 float InterleavedGradientNoiseDir(float2 position_screen)
 {
@@ -371,7 +373,6 @@ float2 BlockerSearch(float2 uv, float receiver, float searchUV, float3 receiverP
 	float blockerSum = 0.0;
 
 	int samplers = Sampler_Number;// / (cascadeIndex / 2);
-	//UNITY_LOOP
 	for (int i = 0; i < samplers; i++)
 	{
 		float2 offset = VogelDiskSampleDir(i, samplers, randPied) * searchUV;
@@ -428,7 +429,6 @@ float PCF_FilterDir(float2 uv, float receiver, float diskRadius, float3 receiver
 	//if(cascadeIndex == 4)
 		//return 0;
 	int samplers = Sampler_Number;// / (cascadeIndex / 2);
-	//UNITY_LOOP
 	for (int i = 0; i < samplers; i++)
 	{
 		float2 offset = VogelDiskSampleDir(i, samplers, randPied) * diskRadius;
@@ -453,7 +453,7 @@ float PCF_FilterDir(float2 uv, float receiver, float diskRadius, float3 receiver
 float NGSS_Main(float4 coord, float3 receiverPlaneDepthBias, float2 screenpos, uint cascadeIndex)
 {
 	float randPied = InterleavedGradientNoiseDir(screenpos);
-	float shadowSoftness = NGSS_GLOBAL_SOFTNESS;//NGSS_GLOBAL_SOFTNESS default value 100
+	float shadowSoftness = clamp(NGSS_GLOBAL_SOFTNESS, 0.001, 0.25);//NGSS_GLOBAL_SOFTNESS default value 100
 	
 	float2 uv = coord.xy;
 	float receiver = coord.z;// - ditherValue;
@@ -480,6 +480,7 @@ float NGSS_Main(float4 coord, float3 receiverPlaneDepthBias, float2 screenpos, u
 		//return 0.0;//can sample 4 pixels instead of just returning 0
 //#endif	
 
+//PCSS FORMULA: penumbraSize = (receiver - avBlocker) * lightSize / receiver;
 #if defined(UNITY_REVERSED_Z)
 	float penumbra = ((1.0 - receiver) - blockerResults.x);// / (1 - blockerResults.x);
 #else
@@ -495,20 +496,27 @@ float NGSS_Main(float4 coord, float3 receiverPlaneDepthBias, float2 screenpos, u
 	#endif
 
 //#if defined(NGSS_USE_EARLY_BAILOUT_OPTIMIZATION_DIR)
+#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 	UNITY_BRANCH
 	if(NGSS_TEST_SAMPLERS_DIR > 0)
 	{
+#endif
 		shadow = PCF_FilterDir(uv, receiver, diskRadius, receiverPlaneDepthBias, NGSS_TEST_SAMPLERS_DIR, randPied, cascadeIndex);
 		if (shadow == 1.0)//If all pixels are lit early bail out
 			return 1.0;
 		//else if (shadow == 0.0)//If all pixels are shadowed early bail out
 			//return 0.0;
+#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 	}
+#endif
+
 //#endif
 #endif//NGSS_CAN_USE_PCSS_FILTER_DIR
 
+	int samplers = clamp(NGSS_FILTER_SAMPLERS_DIR, 4, 128);//adding a minimal sampling value to avoid black shadowed light
+
 	//float Sampler_Number = (int)clamp(Sampler_Number * (diskRadius / NGSS_GLOBAL_SOFTNESS), Sampler_Number * 0.5, Sampler_Number);
-	shadow = PCF_FilterDir(uv, receiver, diskRadius, receiverPlaneDepthBias, NGSS_FILTER_SAMPLERS_DIR, randPied, cascadeIndex);	
+	shadow = PCF_FilterDir(uv, receiver, diskRadius, receiverPlaneDepthBias, samplers, randPied, cascadeIndex);	
 	return shadow;	
 }
 

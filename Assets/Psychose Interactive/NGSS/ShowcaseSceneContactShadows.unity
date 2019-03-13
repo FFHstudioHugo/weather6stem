@@ -358,6 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NGSS_KEEP_ONDISABLE: 1
+  NGSS_NO_UPDATE_ON_PLAY: 0
   NGSS_SHADOWS_RESOLUTION: 256
   NGSS_SAMPLING_TEST: 16
   NGSS_SAMPLING_DENOISER: 16
@@ -369,7 +370,6 @@ MonoBehaviour:
   GLOBAL_SETTINGS_OVERRIDE: 0
   GLOBAL_SHADOWS_PROJECTION: 1
   GLOBAL_SHADOWS_DISTANCE: 150
-  GLOBAL_CASCADED_SHADOWS: 1
   GLOBAL_CASCADES_COUNT: 4
   GLOBAL_CASCADES_SPLIT_VALUE: 0.1
   NGSS_CASCADES_BLENDING: 1
@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e317e7261b603db488d0fd19b5207ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainDirectionalLight: {fileID: 973744429}
+  contactShadowsLight: {fileID: 973744429}
   contactShadowsShader: {fileID: 4800000, guid: ab1a11124b683ad44bcb86515a434172,
     type: 3}
   m_noiseFilter: 0
@@ -546,7 +546,7 @@ MonoBehaviour:
   m_shadowsSoftness: 0.25
   m_shadowsDistance: 1
   m_shadowsFade: 1
-  m_shadowsOffset: 0.325
+  m_shadowsFrustumBias: 0.05
   m_raySamples: 64
   m_raySamplesScale: 1
   m_rayWidth: 0.1

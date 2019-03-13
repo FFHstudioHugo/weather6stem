@@ -330,7 +330,7 @@ namespace AmplifyShaderEditor
 
 			return TextureChannelUsage.Not_Used;
 		}
-
+		public string SurfaceVertexStructure { get { return ( m_dirtyAppData ? Constants.CustomAppDataFullName : Constants.AppDataFullName ); } }
 		public void OpenPerVertexHeader( bool includeCustomData )
 		{
 			string appData ="inout " + (m_dirtyAppData ? Constants.CustomAppDataFullName : Constants.AppDataFullName)+" ";
@@ -1064,6 +1064,31 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		public bool HasLocalVariable( string value )
+		{
+			switch( m_portCategory )
+			{
+				case MasterNodePortCategory.Vertex:
+				case MasterNodePortCategory.Tessellation:
+				{
+					return m_vertexLocalVariablesDict.ContainsKey( value );
+				}
+				case MasterNodePortCategory.Fragment:
+				case MasterNodePortCategory.Debug:
+				{
+					if( m_usingCustomOutput )
+					{
+						return m_customOutputDict.ContainsKey( value );
+					}
+					else
+					{
+						return m_localVariablesDict.ContainsKey( value );
+					}
+				}
+			}
+			return false;
+		}
+
 		public bool AddToLocalVariables( int nodeId, string value, bool ignoreDuplicates = false )
 		{
 			if( string.IsNullOrEmpty( value ) )
@@ -1590,19 +1615,19 @@ namespace AmplifyShaderEditor
 		public string LocalVariables { get { return m_localVariables; } }
 		public string SpecialLocalVariables { get { return m_specialLocalVariables; } }
 		public string VertexLocalVariables { get { return m_vertexLocalVariables; } }
-		public string VertexLocalVariablesFromList
-		{
-			get
-			{
-				string result = string.Empty;
-				int count = m_vertexLocalVariablesList.Count;
-				for( int i = 0; i < count; i++ )
-				{
-					result += m_vertexLocalVariablesList[ i ].PropertyName + "\n";
-				}
-				return result;
-			}
-		}
+		//public string VertexLocalVariablesFromList
+		//{
+		//	get
+		//	{
+		//		string result = string.Empty;
+		//		int count = m_vertexLocalVariablesList.Count;
+		//		for( int i = 0; i < count; i++ )
+		//		{
+		//			result += m_vertexLocalVariablesList[ i ].PropertyName + "\n";
+		//		}
+		//		return result;
+		//	}
+		//}
 		public string VertexData { get { return m_vertexData; } }
 		public string CustomOutput { get { return m_customOutput; } }
 		public string Functions { get { return m_functions; } }
@@ -1791,7 +1816,16 @@ namespace AmplifyShaderEditor
 		public bool UsingArrayDerivatives
 		{
 			get { return m_usingArrayDerivatives; }
-			set { m_usingArrayDerivatives = value; }
+			set
+			{
+				if( value )
+				{
+					MasterNodeDataCollector instance = this;
+					GeneratorUtils.AddCustomArraySamplingMacros( ref instance );
+				}
+
+				m_usingArrayDerivatives = value;
+			}
 		}
 
 		public bool SafeNormalizeLightDir

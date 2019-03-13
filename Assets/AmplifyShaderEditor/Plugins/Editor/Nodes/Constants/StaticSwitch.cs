@@ -249,7 +249,7 @@ namespace AmplifyShaderEditor
 			return string.Empty;
 		}
 
-		public override bool GetUniformData( out string dataType, out string dataName )
+		public override bool GetUniformData( out string dataType, out string dataName, ref bool fullValue )
 		{
 			dataType = string.Empty;
 			dataName = string.Empty;

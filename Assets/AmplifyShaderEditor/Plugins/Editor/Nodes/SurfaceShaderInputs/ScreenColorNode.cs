@@ -530,7 +530,7 @@ namespace AmplifyShaderEditor
 			return "uniform sampler2D " + PropertyName + ";";
 		}
 
-		public override bool GetUniformData( out string dataType, out string dataName )
+		public override bool GetUniformData( out string dataType, out string dataName, ref bool fullValue )
 		{
 			if( SoftValidReference )
 			{
@@ -540,7 +540,7 @@ namespace AmplifyShaderEditor
 				//	dataName = string.Empty;
 				//}
 
-				return m_referenceNode.GetUniformData( out dataType, out dataName );
+				return m_referenceNode.GetUniformData( out dataType, out dataName, ref fullValue );
 			}
 
 			dataType = "sampler2D";

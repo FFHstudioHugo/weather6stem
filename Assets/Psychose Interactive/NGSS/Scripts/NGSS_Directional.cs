@@ -5,10 +5,12 @@ using UnityEngine.Rendering;
 [ExecuteInEditMode()]
 public class NGSS_Directional : MonoBehaviour
 {
-
     [Header("MAIN SETTINGS")]
     [Tooltip("If disabled, NGSS Directional shadows replacement will be removed from Graphics settings when OnDisable is called in this component.")]
     public bool NGSS_KEEP_ONDISABLE = true;
+
+    [Tooltip("Check this option if you don't need to update shadows variables at runtime, only once when scene loads.\nUseful to save some CPU cycles.")]
+    public bool NGSS_NO_UPDATE_ON_PLAY = false;
 
     //[Tooltip("Useful if you want to fallback to hard shadows at runtime without having to disable the component.")]
     //public bool NGSS_FORCE_HARD_SHADOWS = false;
@@ -35,7 +37,7 @@ public class NGSS_Directional : MonoBehaviour
 
     [Header("SOFTNESS")]
     [Tooltip("Overall softness for all shadows.")]
-    [Range(0f, 2f)]
+    [Range(0f, 10f)]
     public float NGSS_GLOBAL_SOFTNESS = 1f;
 
     //Unity5 does not have Inline sampling so PCSS disabled by default in Unity5
@@ -103,7 +105,8 @@ public class NGSS_Directional : MonoBehaviour
     public float GLOBAL_SHADOWS_DISTANCE = 150f;
 
     [Tooltip("Must be disabled on very low end hardware.\nIf enabled, Cascaded Shadows will be turned off in Graphics Settings.")]
-    public bool GLOBAL_CASCADED_SHADOWS = true;
+    private bool GLOBAL_CASCADED_SHADOWS = true;//MAKE IT PUBLIC IN v2.1 IF GRAPHICS TIER SETTINGS ARE IMPLEMENTED
+    private bool GLOBAL_CASCADED_SHADOWS_STATE = false;
 
     [Range(1, 4)]
     [Tooltip("Number of cascades the shadowmap will have. This option affects your cascade counts in Quality Settings.\nYou should entierly disable Cascaded Shadows (Graphics Menu) if you are targeting low-end devices.")]
@@ -128,8 +131,9 @@ public class NGSS_Directional : MonoBehaviour
     /****************************************************************/
 
     //public Texture noiseTexture;
+    private bool isSetup = false;
     private bool isInitialized = false;
-    private bool isGraphicSet = false;    
+    private bool isGraphicSet = false;
     private Light _DirLight;
     private Light DirLight
     {
@@ -195,6 +199,13 @@ public class NGSS_Directional : MonoBehaviour
 
     void Update()
     {
+        if (Application.isPlaying && NGSS_NO_UPDATE_ON_PLAY && isSetup) { return; }
+
+        if (DirLight.shadows == LightShadows.None) { return; }
+
+        //OBLIGATORY OR CREATES PROJECTION ISSUES IN SOME PLATFORMS
+        DirLight.shadows = LightShadows.Soft;
+
         //if (NGSS_BIAS_FADE) { Shader.EnableKeyword("NGSS_USE_BIAS_FADE_DIR"); Shader.SetGlobalFloat("NGSS_BIAS_FADE_DIR", NGSS_BIAS_FADE_VALUE * 0.001f); } else { Shader.DisableKeyword("NGSS_USE_BIAS_FADE_DIR"); }
         //if (NGSS_FORCE_HARD_SHADOWS) { Shader.EnableKeyword("NGSS_HARD_SHADOWS_DIR"); dirLight.shadows = LightShadows.Hard; return; } else { Shader.DisableKeyword("NGSS_HARD_SHADOWS_DIR"); dirLight.shadows = LightShadows.Soft; }
         NGSS_SAMPLING_TEST = Mathf.Clamp(NGSS_SAMPLING_TEST, 4, NGSS_SAMPLING_FILTER);
@@ -208,7 +219,7 @@ public class NGSS_Directional : MonoBehaviour
         //Scale global softness over distance (to maintain the similar softness when texel size changes
         Shader.SetGlobalFloat("NGSS_GLOBAL_SOFTNESS", NGSS_GLOBAL_SOFTNESS / (QualitySettings.shadowDistance * 0.66f) * (QualitySettings.shadowCascades == 2 ? 1.5f : QualitySettings.shadowCascades == 4 ? 1f : 0.25f));
         //Directional OPTIMIZED
-        Shader.SetGlobalFloat("NGSS_GLOBAL_SOFTNESS_OPTIMIZED", NGSS_GLOBAL_SOFTNESS);//(256 / (GLOBAL_SOFTNESS / 20))        
+        Shader.SetGlobalFloat("NGSS_GLOBAL_SOFTNESS_OPTIMIZED", NGSS_GLOBAL_SOFTNESS / (QualitySettings.shadowDistance));//(256 / (GLOBAL_SOFTNESS / 20))        
         int optimizedSamplers = (int)Mathf.Sqrt(NGSS_SAMPLING_FILTER);
         Shader.SetGlobalInt("NGSS_OPTIMIZED_ITERATIONS", optimizedSamplers % 2 == 0 ? optimizedSamplers + 1 : optimizedSamplers);//we need an odd number for Gaussian-Box filter
         Shader.SetGlobalInt("NGSS_OPTIMIZED_SAMPLERS", NGSS_SAMPLING_FILTER);
@@ -252,13 +263,20 @@ public class NGSS_Directional : MonoBehaviour
         {
             QualitySettings.shadowDistance = GLOBAL_SHADOWS_DISTANCE;
             QualitySettings.shadowProjection = GLOBAL_SHADOWS_PROJECTION;
-            
-            if (GLOBAL_CASCADED_SHADOWS == false)
+#if UNITY_EDITOR
+            /*//TO BE RE-EVALUATED IN V2.1
+            if (GLOBAL_CASCADED_SHADOWS != GLOBAL_CASCADED_SHADOWS_STATE)
             {
-                //ADD CODE THAT DISABLE CASCADED SHADOWS ON GRAPHICS SETTINGS HERE?
+                GLOBAL_CASCADED_SHADOWS_STATE = GLOBAL_CASCADED_SHADOWS;
+                //QualitySettings.shadowCascades = 0;
+                TierSettings tierSettings = EditorGraphicsSettings.GetTierSettings(BuildTargetGroup.iOS, GraphicsTier.Tier3);
+                tierSettings.cascadedShadowMaps = GLOBAL_CASCADED_SHADOWS;
+                EditorGraphicsSettings.SetTierSettings(BuildTargetGroup.iOS, GraphicsTier.Tier3, tierSettings);
+
                 return;
             }
-
+            */
+#endif
             if (GLOBAL_CASCADES_COUNT > 1)
             {
                 QualitySettings.shadowCascades = GLOBAL_CASCADES_COUNT;
@@ -275,5 +293,7 @@ public class NGSS_Directional : MonoBehaviour
         }
 
         if (NGSS_CASCADES_BLENDING && GLOBAL_CASCADES_COUNT > 1) { Shader.EnableKeyword("NGSS_USE_CASCADE_BLENDING"); Shader.SetGlobalFloat("NGSS_CASCADE_BLEND_DISTANCE", NGSS_CASCADES_BLENDING_VALUE * 0.125f); } else { Shader.DisableKeyword("NGSS_USE_CASCADE_BLENDING"); }
+
+        isSetup = true;
     }
 }

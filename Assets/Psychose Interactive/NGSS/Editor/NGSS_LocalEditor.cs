@@ -1,7 +1,5 @@
 ﻿#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
 using UnityEditor;
-using UnityEngine;
 
 [CustomEditor(typeof(NGSS_Local))]
 [CanEditMultipleObjects]
@@ -21,6 +19,7 @@ public class NGSS_LocalEditor : Editor
     SerializedProperty NGSS_SHADOWS_DITHERING;
     SerializedProperty NGSS_SHADOWS_RESOLUTION;
     SerializedProperty NGSS_DISABLE_ON_PLAY;
+    SerializedProperty NGSS_NO_UPDATE_ON_PLAY;
 
     void OnEnable()
     {
@@ -32,6 +31,7 @@ public class NGSS_LocalEditor : Editor
         ///////////GET PROPERTIES///////////
 
         NGSS_DISABLE_ON_PLAY = serializedObject.FindProperty("NGSS_DISABLE_ON_PLAY");
+        NGSS_NO_UPDATE_ON_PLAY = serializedObject.FindProperty("NGSS_NO_UPDATE_ON_PLAY");
 
         //Global
         NGSS_MANAGE_GLOBAL_SETTINGS = serializedObject.FindProperty("NGSS_MANAGE_GLOBAL_SETTINGS");
@@ -54,6 +54,7 @@ public class NGSS_LocalEditor : Editor
         ///////////DRAW PROPERTIES///////////
 
         EditorGUILayout.PropertyField(NGSS_DISABLE_ON_PLAY);
+        EditorGUILayout.PropertyField(NGSS_NO_UPDATE_ON_PLAY);
 
         //Global
         EditorGUILayout.PropertyField(NGSS_MANAGE_GLOBAL_SETTINGS);

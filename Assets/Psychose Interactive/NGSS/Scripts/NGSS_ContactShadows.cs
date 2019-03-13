@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections;
-using System.Collections.Generic;
 
 [ImageEffectAllowedInSceneView]
 [ExecuteInEditMode()]
 public class NGSS_ContactShadows : MonoBehaviour
 {
-    //[Header("REFERENCES")]
-    public Light mainDirectionalLight;
+    [Header("REFERENCES")]
+    public Light contactShadowsLight;
     public Shader contactShadowsShader;
     
     [Header("SHADOWS SETTINGS")]
@@ -32,8 +30,8 @@ public class NGSS_ContactShadows : MonoBehaviour
 	public float m_shadowsFade = 1f;
 
     [Tooltip("Tweak this value if your objects display backface shadows.")]
-    [Range(0.0f, 2f)]
-    public float m_shadowsOffset = 0.325f;
+    [Range(0.0f, 1f)]
+    public float m_shadowsFrustumBias = 0.05f;
     /***********************/
     [Header("RAY SETTINGS")]
     [Tooltip("Number of samplers between each step. The higher values produces less gaps between shadows. Keep this value as low as you can!")]
@@ -47,7 +45,9 @@ public class NGSS_ContactShadows : MonoBehaviour
     [Tooltip("The higher the value, the ticker the shadows will look.")]
     [Range(0.0f, 1.0f)]
 	public float m_rayWidth = 0.1f;
-    
+
+    private Texture2D noMixTexture;
+
     /*******************************************************************************************************************/
 
     private CommandBuffer blendShadowsCB;
@@ -98,11 +98,12 @@ public class NGSS_ContactShadows : MonoBehaviour
             if (canAddBuff) { mCamera.AddCommandBuffer(mCamera.actualRenderingPath == RenderingPath.Forward ? CameraEvent.AfterDepthTexture : CameraEvent.BeforeLighting, computeShadowsCB); }
         }
 
-        if (mainDirectionalLight)
+        //uncomment me if using the screen space blit | comment me if sampling directly from internal NGSS libraries
+        if (contactShadowsLight)
         {
-            bool canAddBuff = true;
-            foreach (CommandBuffer cb in mainDirectionalLight.GetCommandBuffers(LightEvent.AfterScreenspaceMask)) { if (cb.name == blendShadowsCB.name) { canAddBuff = false; } }
-            if (canAddBuff) { mainDirectionalLight.AddCommandBuffer(LightEvent.AfterScreenspaceMask, blendShadowsCB); }
+            bool canAddBuff = true;            
+            foreach (CommandBuffer cb in contactShadowsLight.GetCommandBuffers(LightEvent.AfterScreenspaceMask)) { if (cb.name == blendShadowsCB.name) { canAddBuff = false; } }
+            if (canAddBuff) { contactShadowsLight.AddCommandBuffer(LightEvent.AfterScreenspaceMask, blendShadowsCB); }
         }
     }
 
@@ -110,13 +111,14 @@ public class NGSS_ContactShadows : MonoBehaviour
 	{
         _mMaterial = null;
         if (mCamera) { mCamera.RemoveCommandBuffer(mCamera.actualRenderingPath == RenderingPath.Forward ? CameraEvent.AfterDepthTexture : CameraEvent.BeforeLighting, computeShadowsCB); }
-        if (mainDirectionalLight) { mainDirectionalLight.RemoveCommandBuffer(LightEvent.AfterScreenspaceMask, blendShadowsCB); }
+        //We done need this anymore as the contact shadows mix is done directly on shadow internal files
+        //if (contactShadowsLight) { contactShadowsLight.RemoveCommandBuffer(LightEvent.AfterScreenspaceMask, blendShadowsCB); }
         isInitialized = false;
     }
 
 	void Init()
 	{
-        if (isInitialized || mainDirectionalLight == null) { return; }
+        if (isInitialized || contactShadowsLight == null) { return; }
 
         if (mCamera.actualRenderingPath == RenderingPath.VertexLit)
         {
@@ -127,6 +129,9 @@ public class NGSS_ContactShadows : MonoBehaviour
         }
 
         AddCommandBuffers();
+        //uncomment me if using the screen space blit | comment me if sampling directly from internal NGSS libraries
+        //mix with screen space shadow mask. COMMENT ME IF DIRECTLY CALLED INTERNALLY (Libraries)
+        blendShadowsCB.Blit(BuiltinRenderTextureType.CurrentActive, BuiltinRenderTextureType.CurrentActive, mMaterial, 3);
 
         int cShadow = Shader.PropertyToID("NGSS_ContactShadowRT");
         int cShadow2 = Shader.PropertyToID("NGSS_ContactShadowRT2");
@@ -134,7 +139,8 @@ public class NGSS_ContactShadows : MonoBehaviour
         
         computeShadowsCB.GetTemporaryRT(cShadow, -1, -1, 0, FilterMode.Bilinear, RenderTextureFormat.R8);
         computeShadowsCB.GetTemporaryRT(cShadow2, -1, -1, 0, FilterMode.Bilinear, RenderTextureFormat.R8);
-        computeShadowsCB.GetTemporaryRT(dSource, -1, -1, 0, FilterMode.Point, RenderTextureFormat.RFloat);        
+        computeShadowsCB.GetTemporaryRT(dSource, -1, -1, 0, FilterMode.Point, RenderTextureFormat.RFloat);
+        //computeShadowsCB.SetGlobalTexture(Shader.PropertyToID("ScreenSpaceMask"), BuiltinRenderTextureType.CurrentActive);//requires a commandBuffer on the light, not compatible with local light
 
         computeShadowsCB.Blit(cShadow, dSource, mMaterial, 0);//clip edges
         computeShadowsCB.Blit(dSource, cShadow, mMaterial, 1);//compute ssrt shadows
@@ -151,8 +157,10 @@ public class NGSS_ContactShadows : MonoBehaviour
 
         computeShadowsCB.SetGlobalTexture("NGSS_ContactShadowsTexture", cShadow);
 
-        //mix with screen space shadow mask
-        blendShadowsCB.Blit(BuiltinRenderTextureType.CurrentActive, BuiltinRenderTextureType.CurrentActive, mMaterial, 3);
+        //comment me these 3 lines if sampling directly from internal files
+        noMixTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+        noMixTexture.SetPixel(0, 0, Color.white);
+        noMixTexture.Apply();
 
         isInitialized = true;
 	}
@@ -193,18 +201,29 @@ public class NGSS_ContactShadows : MonoBehaviour
     void OnPreRender()
 	{
         Init();
-        if (isInitialized == false || mainDirectionalLight == null) { return; }        
+        if (isInitialized == false || contactShadowsLight == null) { return; }
 
-        mMaterial.SetVector("LightDir", mCamera.transform.InverseTransformDirection(mainDirectionalLight.transform.forward));
-        mMaterial.SetFloat("ShadowsOpacity", 1f - mainDirectionalLight.shadowStrength);
+        //mMaterial.SetMatrix("InverseProj", Matrix4x4.Inverse(mCamera.projectionMatrix));//proj to cam        
+        //mMaterial.SetMatrix("InverseView", mCamera.cameraToWorldMatrix);//cam to world        
+        //mMaterial.SetMatrix("InverseViewProj", Matrix4x4.Inverse(GL.GetGPUProjectionMatrix(mCamera.projectionMatrix, false) * mCamera.worldToCameraMatrix));//proj to world
+        mMaterial.SetMatrix("WorldToView", mCamera.worldToCameraMatrix);//cam to world        
+        mMaterial.SetVector("LightPos", contactShadowsLight.transform.position);//world position
+        mMaterial.SetVector("LightDir", -mCamera.transform.InverseTransformDirection(contactShadowsLight.transform.forward));//view space direction
+        mMaterial.SetFloat("ShadowsOpacity", 1f - contactShadowsLight.shadowStrength);
         mMaterial.SetFloat("ShadowsEdgeTolerance", m_shadowsEdgeTolerance * 0.075f);
         mMaterial.SetFloat("ShadowsSoftness", m_shadowsSoftness * 4f);
         mMaterial.SetFloat("ShadowsDistance", m_shadowsDistance);        
         mMaterial.SetFloat("ShadowsFade", m_shadowsFade);
-        mMaterial.SetFloat("ShadowsBias", m_shadowsOffset * 0.02f);
+        mMaterial.SetFloat("ShadowsBias", m_shadowsFrustumBias * 0.02f);
         mMaterial.SetFloat("RayWidth", m_rayWidth);
         mMaterial.SetFloat("RaySamples", (float)m_raySamples); 
         mMaterial.SetFloat("RaySamplesScale", m_raySamplesScale);
         if (m_noiseFilter) { mMaterial.EnableKeyword("NGSS_CONTACT_SHADOWS_USE_NOISE"); } else { mMaterial.DisableKeyword("NGSS_CONTACT_SHADOWS_USE_NOISE"); }
+        if (contactShadowsLight.type != LightType.Directional) { mMaterial.EnableKeyword("NGSS_USE_LOCAL_CONTACT_SHADOWS"); } else { mMaterial.DisableKeyword("NGSS_USE_LOCAL_CONTACT_SHADOWS"); }
+    }
+    //uncomment me if using the screen space blit | comment me if sampling directly from internal NGSS libraries
+    void OnPostRender()
+    {
+        Shader.SetGlobalTexture("NGSS_ContactShadowsTexture", noMixTexture);
     }
 }

@@ -33,6 +33,7 @@ namespace AmplifyShaderEditor
 		private bool m_initialized = false;
 		private bool m_checkInvalidConnections = false;
 		private bool m_afterDeserializeFlag = true;
+		
 
 		[SerializeField]
 		private ParentGraph m_customGraph = null;
@@ -44,7 +45,10 @@ namespace AmplifyShaderEditor
 		private GUIStyle m_graphFontStyle;
 		//private GUIStyle _borderStyle;
 		private Texture2D m_wireTexture;
-
+		#if UNITY_2018_3_OR_NEWER
+		[SerializeField]
+		private ASEPackageManagerHelper m_packageManagerHelper = new ASEPackageManagerHelper();
+		#endif
 		[SerializeField]
 		TemplatesManager m_templatesManager;
 
@@ -288,6 +292,8 @@ namespace AmplifyShaderEditor
 		private bool m_nodesLoadedCorrectly = false;
 		private GUIContent NodesExceptionMessage = new GUIContent( "ASE is unable to load correctly due to some faulty other classes/plugin in your project. We advise to review all your imported plugins." );
 
+
+		private bool m_outdatedShaderFromTemplateLoaded = false;
 		private bool m_replaceMasterNode = false;
 		private AvailableShaderTypes m_replaceMasterNodeType;
 		private string m_replaceMasterNodeData;
@@ -549,6 +555,9 @@ namespace AmplifyShaderEditor
 		public override void OnEnable()
 		{
 			base.OnEnable();
+			#if UNITY_2018_3_OR_NEWER
+			m_packageManagerHelper.RequestInfo();
+			#endif
 			if( m_templatesManager == null )
 			{
 				m_templatesManager = IOUtils.FirstValidTemplatesManager;
@@ -1307,6 +1316,7 @@ namespace AmplifyShaderEditor
 			m_mainGraphInstance.OnShaderUpdatedEvent += OnShaderUpdated;
 			m_mainGraphInstance.OnEmptyGraphDetectedEvt += OnEmptyGraphDetected;
 			m_mainGraphInstance.OnNodeRemovedEvent += m_toolsWindow.OnNodeRemovedFromGraph;
+			m_outdatedShaderFromTemplateLoaded = false;
 			GraphCount = 1;
 
 			FullCleanUndoStack();
@@ -4035,12 +4045,23 @@ namespace AmplifyShaderEditor
 
 			switch( severity )
 			{
-				case MessageSeverity.Normal: { m_genericMessageContent.text = string.Empty; } break;
-				case MessageSeverity.Warning: { m_genericMessageContent.text = "Warning!\n"; } break;
-				case MessageSeverity.Error: { m_genericMessageContent.text = "Error!!!\n"; } break;
+				case MessageSeverity.Normal:
+				{
+					m_genericMessageContent.text = message;
+					Debug.Log( message );
+				}break;
+				case MessageSeverity.Warning:
+				{
+					m_genericMessageContent.text = "Warning!\n"+ message;
+					Debug.LogWarning( message );
+				} break;
+				case MessageSeverity.Error:
+				{
+					m_genericMessageContent.text = "Error!!!\n"+ message;
+					Debug.LogError( message );
+				} break;
 			}
-			m_genericMessageContent.text += message;
-			Debug.Log( message );
+
 			try
 			{
 				ShowNotification( m_genericMessageContent );
@@ -4054,37 +4075,7 @@ namespace AmplifyShaderEditor
 		public bool MouseInteracted = false;
 
 
-		void CheckNodeReplacement()
-		{
-			if( m_replaceMasterNode )
-			{
-				m_replaceMasterNode = false;
-				switch( m_replaceMasterNodeType )
-				{
-					default:
-					case AvailableShaderTypes.SurfaceShader:
-					{
-						SetStandardShader();
-					}
-					break;
-					case AvailableShaderTypes.Template:
-					{
-
-						if( m_replaceMasterNodeDataFromCache )
-						{
-							TemplateDataParent templateData = m_templatesManager.GetTemplate( m_replaceMasterNodeData );
-							m_mainGraphInstance.CrossCheckTemplateNodes( templateData );
-							//m_clipboard.GetMultiPassNodesFromClipboard( m_mainGraphInstance.MultiPassMasterNodes.NodesList );
-						}
-						else
-						{
-							SetTemplateShader( m_replaceMasterNodeData, false );
-						}
-					}
-					break;
-				}
-			}
-		}
+		
 
 		void OnGUI()
 		{
@@ -4590,6 +4581,10 @@ namespace AmplifyShaderEditor
 		
 		void OnInspectorUpdate()
 		{
+			#if UNITY_2018_3_OR_NEWER
+			m_packageManagerHelper.Update();
+			#endif
+
 			if( m_afterDeserializeFlag )
 			{
 				m_afterDeserializeFlag = false;
@@ -4992,6 +4987,11 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		public void SetOutdatedShaderFromTemplate()
+		{
+			m_outdatedShaderFromTemplateLoaded = true;
+		}
+
 		public void ReplaceMasterNode( MasterNodeCategoriesData data, bool cacheMasterNodes )
 		{
 			m_replaceMasterNodeType = data.Category;
@@ -5001,6 +5001,47 @@ namespace AmplifyShaderEditor
 			if( cacheMasterNodes )
 			{
 				m_clipboard.AddMultiPassNodesToClipboard( m_mainGraphInstance.MultiPassMasterNodes.NodesList );
+			}
+		}
+
+		void CheckNodeReplacement()
+		{
+			if( m_replaceMasterNode )
+			{
+				m_replaceMasterNode = false;
+				switch( m_replaceMasterNodeType )
+				{
+					default:
+					case AvailableShaderTypes.SurfaceShader:
+					{
+						SetStandardShader();
+					}
+					break;
+					case AvailableShaderTypes.Template:
+					{
+
+						if( m_replaceMasterNodeDataFromCache )
+						{
+							TemplateDataParent templateData = m_templatesManager.GetTemplate( m_replaceMasterNodeData );
+							m_mainGraphInstance.CrossCheckTemplateNodes( templateData );
+							m_clipboard.GetMultiPassNodesFromClipboard( m_mainGraphInstance.MultiPassMasterNodes.NodesList );
+						}
+						else
+						{
+							SetTemplateShader( m_replaceMasterNodeData, false );
+						}
+					}
+					break;
+				}
+			}
+			else if( m_outdatedShaderFromTemplateLoaded )
+			{
+				m_outdatedShaderFromTemplateLoaded = false;
+				TemplateMultiPassMasterNode masterNode = m_mainGraphInstance.CurrentMasterNode as TemplateMultiPassMasterNode;
+				if( masterNode != null )
+				{
+					ReplaceMasterNode( masterNode.CurrentCategoriesData, true );
+				}
 			}
 		}
 
@@ -5209,5 +5250,8 @@ namespace AmplifyShaderEditor
 		public InnerWindowEditorVariables InnerWindowVariables { get { return m_innerEditorVariables; } }
 		public TemplatesManager TemplatesManagerInstance { get { return m_templatesManager; } }
 		public Material CurrentMaterial { get { return CurrentGraph.CurrentMaterial; } }
+		#if UNITY_2018_3_OR_NEWER
+		public ASEPackageManagerHelper PackageManagerHelper { get { return m_packageManagerHelper; } }
+		#endif
 	}
 }

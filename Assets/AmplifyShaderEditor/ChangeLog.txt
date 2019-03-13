@@ -1,4 +1,139 @@
 Release Notes:
+v1.6.3 rev 01:
+* Fixes:
+    * Fixed issue on screen position calculation across all templates
+    * Fixed issue with 'Parallax Occlusion Mapping' node
+
+* Improvements:
+    * Minor tweak on Post-Processing Stack template
+
+v1.6.3 rev 00:
+* Fixes:
+    * Fixed multiple issues with 'Triplanar Sample' node over SRP
+
+v1.6.2 rev 11:
+* Fixes:
+    * Fixed issue on ST registry at 'Parallax Occlusion Mapping' node not taking SRP name convention into account
+    * 'Reconstruct World Position From Depth' shader function now compatible with HDRP
+    * Fixed crash caused by the 'Outline' node when attempting to be used on nested shader functions
+    * Fixed issues with 'Screen Position', 'Depth Fade' and 'Screen Depth' nodes on PPS template
+
+v1.6.2 rev 10:
+* New Template:
+    * PostProcessStack
+        * Post-Processing shader based on Unity provided example
+
+* New Sample:
+    * Mosaic Effect PPS
+
+* New Tool:
+    * Post-Processing Stack Tool
+        * Generates a cs script with a PPS Renderer and Settings from a given shader
+
+* New Shader Function:
+    * Decoding Directional Lightmap
+
+* Improvements:
+    * Added inline property for Alpha to Coverage option on Standard Surface Shader Type
+
+* Fixes:
+    * Fixed 'Triplanar Sample' and 'Parallax Occlusion Mapping' nodes issues with texture arrays on SRP
+    * Fixed crash caused by the 'Outline' node when attempting to be used on templates
+        * This node is specific to Standard Surface Shader Type
+    * Fixed issue with using Lightweight PBR legacy template
+
+v1.6.2 rev 08/09:
+* Fixes:
+    * Fixed issue with depth texture fetching on Lightweight SRP
+
+v1.6.2 rev 07:
+* Fixes:
+    * Fixed issue on template asset post processor
+
+v1.6.2 rev 06:
+* Improvements:
+    * Updated Decals code and removed warnings from HD Lit template
+    * Improved behavior when loading outdated meta from shaders using modified templates
+    * Added No Scale and Offset attribute to 'Texture Array' node
+
+* Fixes:
+    * Fixed instancing issues over HD Lit template
+
+v1.6.2 rev 05:
+* New Shader Function:
+    * Blinn Phong Light Wrap
+
+* Fixes:
+    * Fixed issue with null pointer exception when hacking selection on dynamic ports
+        * Input ports which appear on p.e. 'Add' and 'Multiply' nodes when dragging wires
+    * Fixed shadow issues on HD PBR samples
+    * Fixed 'Billboard' node issues on HD SRP
+    * Fixed D3D11 internal compiler error on Android + VR over multiple templates
+    * Fixed issue with Depth Texture declaration on particles template over Android + VR
+    * Fixed issue with local var declaration of custom types on 'Custom Expression' node
+    * Fixed issue with 'Object To World','World To Object' and 'Transform Position' nodes
+
+* Improvements:
+    * Added the action of (de)activating ZWrite when Surface type is selected on HD Lit template
+    * Added the action of selecting correct Blend RGB when Surface Type is selected on HD Lit template
+    * Improved failsafe to when template creators changes order on passes, removes or add new ones
+    * Depth Texture now being declared with Unity's own macro on Unity 5.6 and above to prevent issues
+    * Updated HD templates and samples to v.4.9.0
+        * Users can still use v4.8.0 although template shaders will present an error
+        * Final compiled shader will have error removed
+    * Added Refraction's Chromatic Aberration as an Inline Property on Standard Surface
+        * Located on Blend Mode menu, bellow Refraction Layer option
+        * Only shows when Refraction port is connected
+    * 'DecodeLightmap' now working on latest SRP templates
+    * 'Fetch Lightmap Value' shader function now takes SRP into account
+
+v1.6.2 rev 04:
+* Fixes:
+    * Fixed World To Object and Object To World operations on Lightweight SRP
+
+* Improvements:
+    * Added support for Terrain instancing over Unity 2018.3
+    * Correctly handling when user wants to disable main output node
+    * Minor tweaks over SRP templates global tags to be able to properly inject code dependent on vertex data
+
+v1.6.2 rev 03:
+* Fixes:
+    * Fixed issue on HD Lit Motion Vector's pass
+    * Fixed issue with Default UI template when used on Sprite Renderers
+
+* Improvements:
+    * SRP templates no longer have CBuffer block pre-written
+        * Instanced Properties now correctly declare CBlocks
+    * Added new Receive Shadows option into Lightweight templates to correctly handle shadows
+
+v1.6.2 rev 02:
+* New Node:
+    * Instance Id
+
+* Fixes:
+    * Fixed issue on not being able to have multiple property nodes fetching the same variable
+    * Fixed version issue on both HD and LW samples
+
+* Improvements:
+    * Removed hard cap on interpolator usage on templates
+        * Message is thrown to the user if maximum allowed by shader model is reached
+
+v1.6.2 rev 01:
+* New Template:
+    * HD Lit
+
+* New Sample:
+    * SRP HD Lit Refraction
+
+* Improvements:
+    * Can add options on template which lets users change its behavior when using it on ASE
+    * Added Vertex Position option into Unlit and SRP templates
+        * Specified value on Vertex input port can now be either a relative value or an absolute one
+    * Passes can now be excluded from final shader through Available Passes menu over SubShader Properties
+
+* Fixes:
+    * Fixed issues with Lightweight PBR Shadow Caster on WebGL and Android
+
 v1.6.2 rev 00 / v1.6.1 rev 05:
 * New Template:
     * Unlit Lightmap

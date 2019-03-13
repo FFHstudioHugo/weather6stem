@@ -1156,7 +1156,7 @@ namespace AmplifyShaderEditor
 					string mainData = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
 					RegisterLocalVariable( 0, string.Format( Constants.CodeWrapper, mainData ), ref dataCollector, localVarName );
 				}
-
+				
 				if( codeContainsReturn )
 				{
 					string function = WrapCodeInFunction( dataCollector.IsTemplate, expressionName, false );
@@ -1165,8 +1165,17 @@ namespace AmplifyShaderEditor
 					{
 						string inputPortLocalVar = m_inputPorts[ i ].Name + OutputId;
 						string result = m_inputPorts[ i ].GeneratePortInstructions( ref dataCollector );
-						dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, m_inputPorts[ i ].DataType, inputPortLocalVar, result );
 						int idx = i - m_firstAvailablePort;
+						if( m_inputPorts[ i ].DataType != WirePortDataType.OBJECT )
+						{
+							dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, m_inputPorts[ i ].DataType, inputPortLocalVar, result );
+						}
+						else
+						{
+							string inputLocalVar = string.Format( Constants.LocalValueDecWithoutIdent, m_items[ idx ].CustomType, inputPortLocalVar, result );
+							dataCollector.AddLocalVariable( UniqueId, inputLocalVar );
+						}
+
 						if( m_items[ idx ].Qualifier != VariableQualifiers.In )
 						{
 							OutputPort currOutputPort = GetOutputPortByUniqueId( CreateOutputId( m_inputPorts[ i ].PortId ) );

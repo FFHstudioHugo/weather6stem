@@ -7,7 +7,10 @@ public class NGSS_Local : MonoBehaviour
 {
     [Tooltip("Check this option to disable this component from receiving updates calls at runtime or when you hit play in Editor.\nUseful when you have lot of lights in your scene and you don't want that many update calls.")]
     public bool NGSS_DISABLE_ON_PLAY = false;
-        
+
+    [Tooltip("Check this option if you don't need to update shadows variables at runtime, only once when scene loads.\nUseful when you have lot of lights in your scene and you don't want that many update calls.")]
+    public bool NGSS_NO_UPDATE_ON_PLAY = false;
+
     [Tooltip("If enabled, this component will manage GLOBAL SETTINGS for all Local shadows.\nEnable this option only in one of your scene local lights to avoid multiple lights fighting for global tweaks.\nLOCAL SETTINGS are not affected by this option.")]
     public bool NGSS_MANAGE_GLOBAL_SETTINGS = false;
 
@@ -98,7 +101,9 @@ public class NGSS_Local : MonoBehaviour
     {
         if (isInitialized) { return; }
 
-        SetProperties(true);
+        LocalLight.shadows = NGSS_SHADOWS_DITHERING ? LightShadows.Soft : LightShadows.Hard;
+
+        SetProperties(NGSS_MANAGE_GLOBAL_SETTINGS);
 
         isInitialized = true;
     }
@@ -116,7 +121,10 @@ public class NGSS_Local : MonoBehaviour
 
     void Update()
     {
-        if (NGSS_DISABLE_ON_PLAY && Application.isPlaying) { enabled = false; return; }
+        if (LocalLight.shadows == LightShadows.None) { return; }
+
+        if (Application.isPlaying) { if (NGSS_DISABLE_ON_PLAY) { enabled = false; return; } if (NGSS_NO_UPDATE_ON_PLAY) { return; } }
+
         SetProperties(NGSS_MANAGE_GLOBAL_SETTINGS);
     }
 

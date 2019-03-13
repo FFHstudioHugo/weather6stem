@@ -10,8 +10,8 @@ namespace AmplifyShaderEditor
 	{
 		public const byte Major = 1;
 		public const byte Minor = 6;
-		public const byte Release = 2;
-		public static byte Revision = 00;
+		public const byte Release = 3;
+		public static byte Revision = 01;
 		
 		//private static string StageSuffix = "_dev0"+Revision;
 		

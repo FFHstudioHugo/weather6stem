@@ -390,7 +390,8 @@ namespace AmplifyShaderEditor
 			"UNITY_PASS_FORWARDBASE",
 			"UNITY_PASS_FORWARDADD",
 			"UNITY_PASS_DEFERRED",
-			"UNITY_PASS_SHADOWCASTER"
+			"UNITY_PASS_SHADOWCASTER",
+			"UNITY_INSTANCING_ENABLED"
 		};
 
 		public static readonly string[] CategoryPresets =
@@ -1745,14 +1746,14 @@ namespace AmplifyShaderEditor
 			return WirePortDataType.FLOAT;
 		}
 
-		public static string GenerateUniformName( bool excludeUniformKeword, WirePortDataType dataType, string dataName )
+		public static string GenerateUniformName( bool excludeUniformKeyword, WirePortDataType dataType, string dataName )
 		{
-			int index = excludeUniformKeword ? 1 : 0;
-			return string.Format( Constants.UniformDec[ index ], WirePortToCgType( dataType ), dataName );
+			return GenerateUniformName( excludeUniformKeyword, WirePortToCgType( dataType ), dataName );
 		}
-		public static string GenerateUniformName( bool excludeUniformKeword, string dataType, string dataName )
+
+		public static string GenerateUniformName( bool excludeUniformKeyword, string dataType, string dataName )
 		{
-			int index = excludeUniformKeword ? 1 : 0;
+			int index = excludeUniformKeyword ? 1 : 0;
 			return string.Format( Constants.UniformDec[index], dataType, dataName );
 		}
 

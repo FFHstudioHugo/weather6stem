@@ -37,7 +37,7 @@ namespace AmplifyShaderEditor
 
 		private const string AseObjectToWorldDirVarName = "objToWorldDir";
 		private const string AseObjectToWorldDirFormat = "mul( unity_ObjectToWorld, float4( {0}, 0 ) ).xyz";
-		private const string AseHDObjectToWorldDirFormat = "mul( GetObjectToWorldMatrix(), float4( {0}, 0 ) ).xyz";
+		private const string AseSRPObjectToWorldDirFormat = "mul( GetObjectToWorldMatrix(), float4( {0}, 0 ) ).xyz";
 
 		private const string AseObjectToViewDirVarName = "objToViewDir";
 		private const string AseObjectToViewDirFormat = "mul( UNITY_MATRIX_IT_MV, float4( {0}, 0 ) ).xyz";
@@ -45,7 +45,7 @@ namespace AmplifyShaderEditor
 
 		private const string AseWorldToObjectDirVarName = "worldToObjDir";
 		private const string AseWorldToObjectDirFormat = "mul( unity_WorldToObject, float4( {0}, 0 ) ).xyz";
-		private const string AseHDWorldToObjectDirFormat = "mul( GetWorldToObjectMatrix(), float4( {0}, 0 ) ).xyz";
+		private const string AseSRPWorldToObjectDirFormat = "mul( GetWorldToObjectMatrix(), float4( {0}, 0 ) ).xyz";
 
 
 		private const string AseWorldToViewDirVarName = "worldToViewDir";
@@ -159,8 +159,8 @@ namespace AmplifyShaderEditor
 						default: case TransformSpace.Object: break;
 						case TransformSpace.World:
 						{
-							if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.HD )
-								result = string.Format( AseHDObjectToWorldDirFormat, result );
+							if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType != TemplateSRPType.BuiltIn )
+								result = string.Format( AseSRPObjectToWorldDirFormat, result );
 							else
 								result = string.Format( AseObjectToWorldDirFormat, result );
 							varName = AseObjectToWorldDirVarName + OutputId;
@@ -197,8 +197,8 @@ namespace AmplifyShaderEditor
 					{
 						case TransformSpace.Object:
 						{
-							if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType == TemplateSRPType.HD )
-								result = string.Format( AseHDWorldToObjectDirFormat, result );
+							if( dataCollector.IsTemplate && dataCollector.TemplateDataCollectorInstance.CurrentSRPType != TemplateSRPType.BuiltIn )
+								result = string.Format( AseSRPWorldToObjectDirFormat, result );
 							else
 								result = string.Format( AseWorldToObjectDirFormat, result );
 							varName = AseWorldToObjectDirVarName + OutputId;

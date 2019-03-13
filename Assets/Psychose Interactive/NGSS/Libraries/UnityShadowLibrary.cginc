@@ -8,7 +8,8 @@
 	#define HANDLE_SHADOWS_BLENDING_IN_GI 1
 #endif
 
-#if (UNITY_VERSION >= 2017)
+#if (UNITY_VERSION < 2017)
+#else
 #define unityShadowCoord float
 #define unityShadowCoord2 float2
 #define unityShadowCoord3 float3
@@ -28,8 +29,8 @@ float3  UnityGetReceiverPlaneDepthBias(float3 shadowCoord, float biasbiasMultipl
 //Samplers per frag
 //#define NGSS_FILTER_SAMPLERS 48									//Used for the final filtering of shadows. Recommended values: Mobile = 16, Consoles = 24, Desktop VR = 32, Desktop High = 48, Desktop Ultra 64
 //#define NGSS_TEST_SAMPLERS 16										//Used to test blocker and early bail out algorithms. This value should never go beyond half Filter_Samplers count or you will slow down the algorithm
-uniform int NGSS_FILTER_SAMPLERS = 32;
 uniform int NGSS_TEST_SAMPLERS = 16;
+uniform int NGSS_FILTER_SAMPLERS = 32;
 
 uniform float NGSS_GLOBAL_OPACITY = 0.0;
 
@@ -54,9 +55,23 @@ uniform float NGSS_PCSS_FILTER_LOCAL;
 
 
 uniform sampler2D unity_RandomRotation16;
+#define NGSS_PCSS_RANDOM_ROTATED_TEXTURE_DEFINED
+
 //uniform sampler2D _BlueNoiseTexture;
 //uniform float4 _BlueNoiseTexture_TexelSize;
-
+/*
+Defines names 			Target platforms
+SHADER_API_D3D11 		Direct3D 11
+SHADER_API_GLCORE 		Desktop OpenGL “core” (GL 3/4)
+SHADER_API_GLES 		OpenGL ES 2.0
+SHADER_API_GLES3 		OpenGL ES 3.0/3.1
+SHADER_API_METAL 		iOS/Mac Metal
+SHADER_API_VULKAN 		Vulkan
+SHADER_API_D3D11_9X 	Direct3D 11 “feature level 9.x” target for Universal Windows Platform
+SHADER_API_PS4 			PlayStation 4. SHADER_API_PSSL is also defined
+SHADER_API_XBOXONE
+SHADER_API_MOBILE 		all general mobile platforms (GLES, GLES3, METAL)
+*/
 //NGSS SUPPORT
 #if (SHADER_TARGET < 30 || defined(SHADER_API_D3D9) || defined(SHADER_API_GLES) || defined(SHADER_API_PSP2) || defined(SHADER_API_N3DS))
     #define NGSS_NO_SUPPORT
@@ -106,7 +121,7 @@ float InterleavedGradientNoise(float2 position_screen)
 		{ 0.75, 0.22, 0.875, 0.375},
 		{ 0.1875, 0.6875, 0.0625, 0.5625},
 		{ 0.9375, 0.4375, 0.8125, 0.3125}};
-	*/
+	*/	
 	float ditherValue = ditherPatternLocal[position_screen.x * NGSS_BANDING_TO_NOISE_RATIO * _ScreenParams.x % 4][position_screen.y * NGSS_BANDING_TO_NOISE_RATIO * _ScreenParams.y % 4] * UNITY_FOUR_PI;	
 	//float ditherValue = tex2D(_BlueNoiseTexture, position_screen / _BlueNoiseTexture_TexelSize.xy).r;//Blue Noise, requires a precomputed noise texture.
 	return ditherValue;//lerp(0, ditherValue, NGSS_BANDING_TO_NOISE_RATIO);
@@ -186,8 +201,8 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 
 #if defined (SHADOWS_DEPTH) && defined (SPOT)
 
-	//INLINE SAMPLING
-	#if (SHADER_TARGET < 30  || UNITY_VERSION <= 570 || defined(SHADER_API_D3D9) || defined(SHADER_API_GLES) || defined(SHADER_API_PSP2) || defined(SHADER_API_N3DS) || defined(SHADER_API_GLCORE))
+	//INLINE SAMPLING //GLCORE support SM3.5 (required for Inline Sampling) but seems to be confused about Z buffer being inverted, so skip it
+	#if (UNITY_VERSION < 2017) || defined(NGSS_NO_SUPPORT) || defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3)// || defined(SHADER_API_METAL)
 		//#define NO_INLINE_SAMPLERS_SUPPORT
 	#else
 		#define NGSS_CAN_USE_PCSS_FILTER
@@ -289,9 +304,6 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 			#endif
 			return shadowFallback;
 		#endif
-				
-		//if(shadowCoord.w < 0.0)
-		//return 1.0;
 
 		float4 coord = shadowCoord;
 		coord.xyz /= coord.w;
@@ -321,9 +333,11 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 		//Use this default radius if no Early bail out is need
 		half diskRadiusFinal = diskRadius * 0.0175;
 		
+		#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 		UNITY_BRANCH
 		if(NGSS_TEST_SAMPLERS > 0)
 		{
+		#endif
 			#if defined (NGSS_CAN_USE_PCSS_FILTER)
 				float diskRadiusPCSS = diskRadius * 0.05;
 				float diskRadiusPCF = diskRadius * 0.0175;
@@ -356,9 +370,13 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 				else if (shadowTest == 0.0)//There are 100% occluders so early out (this saves filtering)
 					return NGSS_GLOBAL_OPACITY;
 			#endif//NGSS_CAN_USE_PCSS_FILTER
+		#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 		}
+		#endif
 		
-		half shadow = PCF_FILTER_SPOT(coord, diskRadiusFinal, randPied, NGSS_FILTER_SAMPLERS, dz_duv);
+		int samplers = clamp(NGSS_FILTER_SAMPLERS, 4, 64);//adding a minimal sampling value to avoid black shadowed light
+		
+		half shadow = PCF_FILTER_SPOT(coord, diskRadiusFinal, randPied, samplers, dz_duv);
 		
 		return lerp(NGSS_GLOBAL_OPACITY, 1.0, shadow);
 	}
@@ -377,7 +395,7 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 
 #if defined (SHADOWS_CUBE)
 	
-	//INLINE SAMPLING for CubeMaps are only available in 2017.3 and forward
+	//INLINE SAMPLING for CubeMaps are only available in 2017.3 and forward	
 	#if defined(SHADOWS_CUBE_IN_DEPTH_TEX)
 	#define NGSS_CAN_USE_PCSS_FILTER
 	SamplerState my_linear_clamp_smp;
@@ -476,9 +494,11 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 		float avgBlockerDistance = 0.0;
 		half diskRadiusFinal = 0.35;
 		
+		#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 		UNITY_BRANCH
 		if(NGSS_TEST_SAMPLERS > 0)
 		{
+		#endif
 			for (int i = 0; i < NGSS_TEST_SAMPLERS; ++i)
 			{
 				float2 rotatedOffset = VogelDiskSample(i, NGSS_TEST_SAMPLERS, randPied);
@@ -492,8 +512,6 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 				//Can speeded up with Gather and GatherRed (they can sample 4 surrounding pixels at the same time at once)
 				half closestDepth = _ShadowMapTexture.SampleLevel(my_linear_clamp_smp, vecOffset, 0.0);
 				
-				//blockerCount++;
-				//avgBlockerDistance += closestDepth;
 				/*
 				#if defined(UNITY_REVERSED_Z)
 				if (closestDepth >= myOffsetDist)//mydist)
@@ -504,16 +522,20 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 					blockerCount++;
 					avgBlockerDistance += closestDepth;
 				}*/
-				//No conditional branching			
+				
+				//No conditional branching
 				#if defined(UNITY_REVERSED_Z)
 				float sum = closestDepth > myOffsetDist;
-				blockerCount += sum;
-				avgBlockerDistance += closestDepth * sum;
 				#else
 				float sum = closestDepth < myOffsetDist;
+				#endif
+				//GLCORE dont play well with PCSS so skip it
+				#if defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3)// || defined(SHADER_API_METAL)
+				blockerCount += sum;
+				#else
 				blockerCount += sum;
 				avgBlockerDistance += closestDepth * sum;
-				#endif
+				#endif				
 				
 			#else// NO SHADOWS_CUBE_IN_DEPTH_TEX
 			
@@ -539,25 +561,35 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 				return NGSS_GLOBAL_OPACITY;
 			//#endif//NGSS_USE_EARLY_BAILOUT_OPTIMIZATION
 			
-			float dist = avgBlockerDistance / blockerCount;
-			
-			//dist = 1.0 - dist;
-			//dist = _LightProjectionParams.y / (dist + _LightProjectionParams.x);//Convert from light to world space
-			//clamping the kernel size to avoid hard shadows at close ranges
-			//diskRadius *= clamp(dist, NGSS_PCSS_FILTER_POINT_MIN, NGSS_PCSS_FILTER_POINT_MAX);
-			//#if (UNITY_VERSION <= 570 || UNITY_VERSION == 20171 || UNITY_VERSION == 201711 || UNITY_VERSION == 201712 || UNITY_VERSION == 201713 || UNITY_VERSION == 20172 || UNITY_VERSION == 201721 || UNITY_VERSION == 201722)
-			#if (UNITY_VERSION <= 570 || UNITY_VERSION < 201730)
-			half diskRadiusPCF = ((mydist - dist)/(mydist));
+			//GLCORE support SM3.5 (required for Inline Sampling) but seems to be confused about Z buffer being inverted, so skip it
+			#if defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3)// || defined(SHADER_API_METAL)
+				diskRadiusFinal = 0.35;//Lerp between PCF and PCSS
 			#else
-			half diskRadiusPCF = ((mydist - dist)/(dist));
+				float dist = avgBlockerDistance / blockerCount;
+				
+				//dist = 1.0 - dist;
+				//dist = _LightProjectionParams.y / (dist + _LightProjectionParams.x);//Convert from light to world space
+				//clamping the kernel size to avoid hard shadows at close ranges
+				//diskRadius *= clamp(dist, NGSS_PCSS_FILTER_POINT_MIN, NGSS_PCSS_FILTER_POINT_MAX);
+				//#if (UNITY_VERSION <= 570 || UNITY_VERSION == 20171 || UNITY_VERSION == 201711 || UNITY_VERSION == 201712 || UNITY_VERSION == 201713 || UNITY_VERSION == 20172 || UNITY_VERSION == 201721 || UNITY_VERSION == 201722)
+				#if (UNITY_VERSION <= 570 || UNITY_VERSION < 201730)
+				half diskRadiusPCF = ((mydist - dist)/(mydist));
+				#else
+				half diskRadiusPCF = ((mydist - dist)/(dist));
+				#endif			
+			
+				diskRadiusFinal = lerp(0.35, diskRadiusPCF, NGSS_PCSS_FILTER_LOCAL);//Lerp between PCF and PCSS
 			#endif
-			diskRadiusFinal = lerp(0.35, diskRadiusPCF, NGSS_PCSS_FILTER_LOCAL);//Lerp between PCF and PCSS
+		#if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING)
 		}
+		#endif
+		
+		int samplers = clamp(NGSS_FILTER_SAMPLERS, 4, 64);//adding a minimal sampling value to avoid black shadowed light
 		
 		//PCF FILTERING
-		for (int j = 0; j < NGSS_FILTER_SAMPLERS; ++j)
+		for (int j = 0; j < samplers; ++j)
 		{
-			float2 rotatedOffset = VogelDiskSample(j, NGSS_FILTER_SAMPLERS, randPied);
+			float2 rotatedOffset = VogelDiskSample(j, samplers, randPied);
 			float3 sampleDir = xaxis * rotatedOffset.x + yaxis * rotatedOffset.y;
 			
 		#if defined(SHADOWS_CUBE_IN_DEPTH_TEX)
@@ -575,7 +607,7 @@ float SlopeBasedBiasCombine(float z0, float2 dz_duv, float2 offset)
 		#endif//SHADOWS_CUBE_IN_DEPTH_TEX
 		}
 		
-		return lerp(NGSS_GLOBAL_OPACITY, 1.0, shadow / NGSS_FILTER_SAMPLERS);
+		return lerp(NGSS_GLOBAL_OPACITY, 1.0, shadow / samplers);
 	}
 	
 	inline half UnitySampleShadowmap(float3 vec)

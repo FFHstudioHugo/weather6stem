@@ -1,0 +1,27 @@
+V2.0.7:
+- Fixed a bug with NGSS_Directional component not updating shader global values if NGSS_NO_UPDATE_ON_PLAY was enabled
+
+V2.0.6:
+- Fixed two bugs with directional shadows in Forward when Cascaded Shadows where disabled.
+One with shadows opacity and the other with the shadows softness not scaling well.
+
+V2.0.5:
+- Added coherent branching compiler defines (improves speed on some APIs/platforms)
+- Macro speed improvements to PCF, skipping couple of unneeded instructions (all shadows)
+- Ability to stop NGSS components from updating variables or receiving updates at runtime (if no needed)
+- Disabling shadows on the light will stop NGSS component from update shadows variables
+- Fixed a bug where new added local lights to the scene will override existing Global Settings
+- Added support to OpenGLCore (PCF Local Shadows and PCSS/PCF Directional shadows)
+- Added PCSS support to GLES3.0 (Directional shadows only, Local shadows still use PCF)
+- Fixed a bug with Arkit shadowprojection
+- NGSS libraries has now default minimal values (to avoid shadowed screen on install)
+- Fixed a rare bug with Spot light shadows on Mac (Metal API)
+- Removed OrderedDitheringDir array out of function (causes compilation error in PS4)
+- Removed System.Security.AccessControl and its method block code (no needed)
+- Cleaned up unneeded namespaces from NGSS components
+- Fixed Contact shadows leaking on top of the main camera (can now be used on multiple cameras game setup). Renamed the light property into a more generic one, if you don't see ContactShadows make sure the light property is not null.
+- NGSS internal libraries can now be added directly to shaders using the #include compiler directive. Useful if you can’t install the library locally, for example cloud builds (Refer to documentation)
+- Update to documentation & new video tutorial added (to reflect new changes) 
+
+V2.0.2:
+- Initial public release

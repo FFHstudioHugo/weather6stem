@@ -356,6 +356,15 @@ namespace AmplifyShaderEditor
 
 		public string GetTexture2DUniformValue()
 		{
+			if( m_containerGraph.SamplingThroughMacros )
+			{
+				if( m_containerGraph.IsSRP )
+					return string.Format( Constants.TexDeclarationSRPMacros[ TextureType.Texture2D ], PropertyName );
+
+					return string.Format( Constants.TexDeclarationStandardMacros[ TextureType.Texture2D ], PropertyName );
+
+			}
+
 			return "uniform sampler2D " + PropertyName + ";";
 		}
 
@@ -367,6 +376,13 @@ namespace AmplifyShaderEditor
 
 		public string GetTexture3DUniformValue()
 		{
+			if( m_containerGraph.SamplingThroughMacros )
+			{
+				if( m_containerGraph.IsSRP )
+					return string.Format( Constants.TexDeclarationSRPMacros[ TextureType.Texture3D ], PropertyName );
+
+				return string.Format( Constants.TexDeclarationStandardMacros[ TextureType.Texture3D ], PropertyName );
+			}
 			return "uniform sampler3D " + PropertyName + ";";
 		}
 
@@ -378,6 +394,14 @@ namespace AmplifyShaderEditor
 
 		public string GetCubeUniformValue()
 		{
+			if( m_containerGraph.SamplingThroughMacros )
+			{
+				if( m_containerGraph.IsSRP )
+					return string.Format( Constants.TexDeclarationSRPMacros[ TextureType.Cube ], PropertyName );
+
+				return string.Format( Constants.TexDeclarationStandardMacros[ TextureType.Cube ], PropertyName );
+			}
+
 			return "uniform samplerCUBE " + PropertyName + ";";
 		}
 
@@ -389,6 +413,14 @@ namespace AmplifyShaderEditor
 
 		public string GetTexture2DArrayUniformValue()
 		{
+			if( m_containerGraph.SamplingThroughMacros )
+			{
+				if( m_containerGraph.IsSRP )
+					return string.Format( Constants.TexDeclarationSRPMacros[ TextureType.Texture2DArray ], PropertyName );
+
+				return string.Format( Constants.TexDeclarationStandardMacros[ TextureType.Texture2DArray ], PropertyName );
+			}
+
 			return "uniform TEXTURE2D_ARRAY( " + PropertyName + " );" + "\nuniform SAMPLER( sampler" + PropertyName + " );";
 		}
 
@@ -934,8 +966,29 @@ namespace AmplifyShaderEditor
 			return string.Empty;
 		}
 
-		public override bool GetUniformData( out string dataType, out string dataName )
+		public override bool GetUniformData( out string dataType, out string dataName, ref bool fullValue )
 		{
+			if( m_containerGraph.SamplingThroughMacros )
+			{
+				if( m_containerGraph.IsSRP )
+				{
+					if( Constants.TexDeclarationSRPMacros.ContainsKey( m_currentType ) )
+					{
+						dataName = string.Format( Constants.TexDeclarationSRPMacros[ m_currentType ], PropertyName );
+						dataType = string.Empty;
+						fullValue = true;
+						return true;
+					}
+				}
+				else if( Constants.TexDeclarationStandardMacros.ContainsKey( m_currentType ) )
+				{
+					dataName = string.Format( Constants.TexDeclarationStandardMacros[ m_currentType ], PropertyName );
+					dataType = string.Empty;
+					fullValue = true;
+					return true;
+				}
+			}
+
 			if( m_currentType == TextureType.Texture2DArray )
 			{
 				MasterNode masterNode = UIUtils.CurrentWindow.OutsideGraph.CurrentMasterNode;
@@ -949,6 +1002,7 @@ namespace AmplifyShaderEditor
 				dataName = m_propertyName + " )";
 				return true;
 			}
+			
 
 			dataType = UIUtils.TextureTypeToCgType( m_currentType );
 			dataName = m_propertyName;

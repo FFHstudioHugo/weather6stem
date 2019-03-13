@@ -86,6 +86,11 @@ half UnityDeferredSampleShadowMask(float2 uv)
 
     return shadowMaskAttenuation;
 }
+/////////////////////////////////NGSS CONTACT SHADOWS//////////////////////////
+
+sampler2D NGSS_ContactShadowsTexture;
+half4 NGSS_ContactShadowsTexture_ST;
+float ShadowsOpacity;
 
 /////////////////////////////////NGSS DENOISER/////////////////////////////////
 
@@ -122,14 +127,16 @@ half UnityDeferredSampleRealtimeShadow(half fade, float3 vec, float2 uv)
 				float final_shadow = 0.0;
 				float Z = 0.0;
 				
-				float mSize = NGSS_DENOISER_ITERATIONS;
+				float mSize = clamp(NGSS_DENOISER_ITERATIONS, 3, 49);//incoming number is always odd
 				float kSize = (mSize-1)/2;
 				
 				float shadowClean;
 				float factor;
 				float bZ = 1.0/normpdf3(0.0, BSIGMA);
 				
-				float softness = NGSS_GLOBAL_SOFTNESS_DENOISER / NGSS_DENOISER_SIZE;//NGSS_GLOBAL_SOFTNESS_DENOISER / _ShadowMapTexture_TexelSize.zw
+				//float softness = NGSS_GLOBAL_SOFTNESS_DENOISER / NGSS_DENOISER_SIZE;//best value for NGSS_DENOISER_SIZE is 512
+				float softness = clamp(NGSS_GLOBAL_SOFTNESS_DENOISER, 0.1, 2.0) / clamp(NGSS_DENOISER_SIZE, 128, 1024);//NGSS_GLOBAL_SOFTNESS_DENOISER / _ShadowMapTexture_TexelSize.zw
+				
 				//read out the texels
 				for (float i=-kSize; i <= kSize; ++i)
 				{
@@ -179,6 +186,9 @@ half UnityDeferredSampleRealtimeShadow(half fade, float3 vec, float2 uv)
     #if defined(UNITY_FAST_COHERENT_DYNAMIC_BRANCHING) && defined(SHADOWS_SOFT) && !defined(LIGHTMAP_SHADOW_MIXING)
     }
     #endif
+	
+	//shadowAttenuation *= saturate(tex2D(NGSS_ContactShadowsTexture, UnityStereoScreenSpaceUVAdjust(uv, NGSS_ContactShadowsTexture_ST)) + ShadowsOpacity);
+	//shadowAttenuation *= saturate(tex2D(NGSS_ContactShadowsTexture, uv) + ShadowsOpacity);
 
     return shadowAttenuation;
 }

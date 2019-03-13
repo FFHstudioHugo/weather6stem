@@ -83,12 +83,22 @@ Shader "Hidden/NGSS_ContactShadows"
 		Pass // render screen space rt shadows
 		{
 			CGPROGRAM
-			#pragma multi_compile _ NGSS_CONTACT_SHADOWS_USE_NOISE
-
+			//#pragma multi_compile _ NGSS_CONTACT_SHADOWS_USE_NOISE
+			#pragma shader_feature NGSS_CONTACT_SHADOWS_USE_NOISE
+			#pragma shader_feature NGSS_USE_LOCAL_CONTACT_SHADOWS
+			
 			sampler2D _MainTex;
+			//sampler2D ScreenSpaceMask;
 			//half4 _MainTex_ST;
-
+			
+			//float4x4 unity_CameraInvProjection;
+			//float4x4 InverseView;//camera to world
+			//float4x4 InverseViewProj;//clip to world
+			//float4x4 InverseProj;//clip to camera			
+			float4x4 WorldToView;//world to camera
+			
 			float3 LightDir;
+			float3 LightPos;
 			float ShadowsDistance;
 			float RaySamples;
 			float RayWidth;
@@ -107,27 +117,43 @@ Shader "Hidden/NGSS_ContactShadows"
 			
 			fixed4 frag (v2f input) : SV_Target
 			{
+				//Early out?
+				//float mask = tex2D(_MainTex, input.uv).r;
+				//if (mask < 0.001) return mask;
+				
 				float2 coord = input.uv;
 				float shadow = 1.0;
 				float depth = tex2Dlod(_MainTex, float4(UnityStereoTransformScreenSpaceTex(coord.xy), 0, 0)).r;
 				//float depth = tex2Dlod(_MainTex, float4(UnityStereoScreenSpaceUVAdjust(coord.xy, _MainTex_ST), 0, 0)).r;
-
+								
 				#if defined(UNITY_REVERSED_Z)
 					depth = 1.0 - depth;
 				#endif
 
 				coord.xy = coord.xy * 2.0 - 1.0;
-				float4 viewPos = mul(unity_CameraInvProjection, float4(coord.xy, depth * 2.0 - 1.0, 1.0));//go from clip to view space
-				viewPos.xyz /= viewPos.w;				
+				float4 clipPos = float4(coord.xy, depth * 2.0 - 1.0, 1.0);
+				
+				float4 viewPos = mul(unity_CameraInvProjection, clipPos);//go from clip to view space | InverseProj
+				viewPos.xyz /= viewPos.w;
+				//viewPos.z *= -1;
 				
 				float samplers = lerp(RaySamples / -viewPos.z, RaySamples, RaySamplesScale);//reduce samplers over distance
-				float3 rayDir = -LightDir * float3(1.0, 1.0, -1.0) * (ShadowsDistance / samplers);
+				#if defined(NGSS_USE_LOCAL_CONTACT_SHADOWS)
+				float3 lightDir = normalize(mul(WorldToView, float4(LightPos.xyz, 1.0)) - viewPos).xyz;//W == 1.0 treat as position | W == 0.0 treat as direction
+				float3 rayDir = lightDir * (ShadowsDistance / samplers);	
+				#else				
+				//float3 lightDir = normalize(mul(WorldToView, float4(LightPos.xyz, 1.0)) - viewPos).xyz;//W == 1.0 treat as position | W == 0.0 treat as direction
+				//float3 rayDir = lightDir * (ShadowsDistance / samplers);				
+				float3 rayDir = LightDir * float3(1.0, 1.0, -1.0) * (ShadowsDistance / samplers);
+				#endif
 				#if defined(NGSS_CONTACT_SHADOWS_USE_NOISE)
 				//float3 rayPos = viewPos + rayDir * saturate(frac(sin(dot(coord, float2(12.9898, 78.223))) * 43758.5453));//NGSS 2.0
 				float3 rayPos = viewPos + rayDir * saturate(ditherPattern[input.uv.x * _ScreenParams.x % 4][input.uv.y * _ScreenParams.y % 4]);//NGSS 2.0
 				#else
 				float3 rayPos = viewPos + rayDir;
 				#endif
+				
+				rayPos -= (viewPos.z * ShadowsBias);
 
 				for (float i = 0; i < samplers; i++)
 				{
@@ -139,7 +165,7 @@ Shader "Hidden/NGSS_ContactShadows"
 					float lDepth = LinearEyeDepth(tex2Dlod(_MainTex, float4(UnityStereoTransformScreenSpaceTex(rayPosProj.xy), 0, 0)).r);
 					//float lDepth = LinearEyeDepth(tex2Dlod(_MainTex, float4(UnityStereoScreenSpaceUVAdjust(rayPosProj.xy, _MainTex_ST), 0, 0)).r);
 
-					float depthDiff = -rayPos.z - lDepth + (viewPos.z * ShadowsBias);//0.02
+					float depthDiff = -rayPos.z - lDepth;// + (viewPos.z * ShadowsBias);//0.02
 					shadow *= (depthDiff > 0.0 && depthDiff < RayWidth)? i / samplers * ShadowsFade : 1.0;
 				}
 				
